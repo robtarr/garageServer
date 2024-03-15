@@ -74,7 +74,7 @@ func particleDoorStatus(deviceID string, token string) status {
 
 	var result status
 
-	if r.Value == 0 {
+	if r.Value == 1 {
 		result.Status = "open"
 	} else {
 		result.Status = "closed"
