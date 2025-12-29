@@ -31,6 +31,8 @@ func callParticle(deviceID string, token string, function string) *http.Response
 
 	body := strings.NewReader(params.Encode())
 
+	log.Println(particleAPI)
+	log.Println(body)
 	req, err := http.NewRequest("POST", particleAPI, body)
 	if err != nil {
 		fmt.Printf("Error sending request: %s", err)
@@ -53,9 +55,12 @@ func getParams(r *http.Request) (string, string) {
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		// fmt.Printf(err)
+		log.Println(err)
 		return "", ""
 	}
+
+	log.Println("JSON")
+	log.Println(data)
 
 	return data.DeviceID, data.Token
 }
@@ -63,6 +68,7 @@ func getParams(r *http.Request) (string, string) {
 func particleDoorStatus(deviceID string, token string) status {
 	resp := callParticle(deviceID, token, "getState")
 
+	log.Println(resp)
 	defer resp.Body.Close()
 
 	var r ApiResponse
@@ -73,6 +79,8 @@ func particleDoorStatus(deviceID string, token string) status {
 	}
 
 	var result status
+
+	log.Println(r.Value)
 
 	if r.Value == 1 {
 		result.Status = "open"
@@ -88,7 +96,14 @@ func (s *server) DoorStatus(w http.ResponseWriter, r *http.Request) {
 
 	deviceID, token := getParams(r)
 
+	log.Println("deviceID: ")
+	log.Println(deviceID)
+	log.Println("token: ")
+	log.Println(token)
 	status := particleDoorStatus(deviceID, token)
+
+	log.Println("status")
+	log.Println(status)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
